@@ -1,0 +1,29 @@
+bundle:
+  name: datalakehouse
+
+targets:
+  dev:
+    workspace:
+      host: https://dbc-8579a162-71bc.cloud.databricks.com
+
+resources:
+  jobs:
+    lakehouse_pipeline:
+      name: lakehouse-pipeline
+
+      tasks:
+        - task_key: bronze
+          notebook_task:
+            notebook_path: bike_lakehouse/bronze/Bronze Layer.ipynb
+
+        - task_key: silver
+          depends_on:
+            - task_key: bronze
+          notebook_task:
+            notebook_path: bike_lakehouse/silver/silver_orchestration.ipynb
+
+        - task_key: gold
+          depends_on:
+            - task_key: silver
+          notebook_task:
+            notebook_path: bike_lakehouse/gold/gold_orchestration.ipynb
