@@ -1,0 +1,7 @@
+.databricks/
+.databricks
+.venv/
+.git/
+__pycache__/
+*.pyc
+*.log
