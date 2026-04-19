@@ -10,20 +10,70 @@ resources:
   jobs:
     lakehouse_pipeline:
       name: lakehouse-pipeline
+      schedule:
+        quartz_cron_expression: "0 0 6 * * ?"
+        timezone_id: "America/Toronto"
 
       tasks:
         - task_key: bronze
           notebook_task:
             notebook_path: bike_lakehouse/bronze/Bronze Layer.ipynb
 
-        - task_key: silver
+        - task_key: silver_crm_cust_info
           depends_on:
             - task_key: bronze
           notebook_task:
-            notebook_path: bike_lakehouse/silver/silver_orchestration.ipynb
+            notebook_path: bike_lakehouse/silver/Silver_crm_cust_info.ipynb
 
-        - task_key: gold
+        - task_key: silver_crm_prd_info
           depends_on:
-            - task_key: silver
+            - task_key: bronze
           notebook_task:
-            notebook_path: bike_lakehouse/gold/gold_orchestration.ipynb
+            notebook_path: bike_lakehouse/silver/Silver_crm_prd_info.ipynb
+
+        - task_key: silver_crm_sales_details
+          depends_on:
+            - task_key: bronze
+          notebook_task:
+            notebook_path: bike_lakehouse/silver/Silver_crm_sales_details.ipynb
+
+        - task_key: silver_erp_cust
+          depends_on:
+            - task_key: bronze
+          notebook_task:
+            notebook_path: bike_lakehouse/silver/Silver_erp_cust.ipynb
+
+        - task_key: silver_erp_loc
+          depends_on:
+            - task_key: bronze
+          notebook_task:
+            notebook_path: bike_lakehouse/silver/Silver_.ipynb
+
+        - task_key: silver_erp_px
+          depends_on:
+            - task_key: bronze
+          notebook_task:
+            notebook_path: bike_lakehouse/silver/Silver_erp_px.ipynb
+
+        - task_key: gold_customers
+          depends_on:
+            - task_key: silver_crm_cust_info
+            - task_key: silver_erp_cust
+            - task_key: silver_erp_loc
+          notebook_task:
+            notebook_path: bike_lakehouse/gold/Gold_customers.ipynb
+
+        - task_key: gold_products
+          depends_on:
+            - task_key: silver_crm_prd_info
+            - task_key: silver_erp_px
+          notebook_task:
+            notebook_path: bike_lakehouse/gold/Gold_products.ipynb
+
+        - task_key: gold_fact_sales
+          depends_on:
+            - task_key: gold_customers
+            - task_key: gold_products
+            - task_key: silver_crm_sales_details
+          notebook_task:
+            notebook_path: bike_lakehouse/gold/Gold_fact_sales.ipynb
